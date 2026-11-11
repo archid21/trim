@@ -13,3 +13,6 @@ docs/project/handoffs/
 
 # Private working notes stay local (progress files and journals)
 docs/project/progress/
+
+# Local agent entry point (not shipped in the plugin)
+CLAUDE.md
