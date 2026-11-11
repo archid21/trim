@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" aria-labelledby="title desc" role="img">
+  <title id="title">Saved Snip</title>
+  <desc id="desc">A saved document with a careful cut, indicating a shorter read without deletion.</desc>
+  <path d="M31 18h47l19 19v63a12 12 0 0 1-12 12H31a12 12 0 0 1-12-12V30a12 12 0 0 1 12-12Z" fill="#5B5CE2"/>
+  <path d="M78 18v19h19" fill="#A8A9F5"/>
+  <path d="M78 18v19h19" stroke="#22235F" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M35 54h45M35 72h28" stroke="white" stroke-width="8" stroke-linecap="round"/>
+  <path d="m85 72 12 12M97 72 85 84" stroke="#F7D84A" stroke-width="7" stroke-linecap="round"/>
+  <path d="M35 91h37" stroke="#A8A9F5" stroke-width="8" stroke-linecap="round"/>
+</svg>

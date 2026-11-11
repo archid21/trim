@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" aria-labelledby="title desc" role="img">
+  <title id="title">Context Funnel</title>
+  <desc id="desc">Text lines become a compact set of lines and the original is saved.</desc>
+  <path d="M24 25h80L76 64v22a8 8 0 0 1-4 6.9l-12 6.9V64z" fill="#5B5CE2"/>
+  <path d="M24 25h80L76 64v22a8 8 0 0 1-4 6.9l-12 6.9V64z" stroke="#22235F" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M39 39h50M45 51h38" stroke="white" stroke-width="7" stroke-linecap="round"/>
+  <path d="M38 103h52" stroke="#5B5CE2" stroke-width="8" stroke-linecap="round"/>
+  <path d="M49 115h30" stroke="#A8A9F5" stroke-width="8" stroke-linecap="round"/>
+  <path d="M96 82v18a7 7 0 0 1-7 7H78" stroke="#F7D84A" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

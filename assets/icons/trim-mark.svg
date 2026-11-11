@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" aria-labelledby="title desc" role="img">
+  <title id="title">Trim Mark</title>
+  <desc id="desc">A concise document in front of its saved full copy.</desc>
+  <rect x="21" y="19" width="70" height="90" rx="16" fill="#E8E8FF"/>
+  <path d="M57 29h24a10 10 0 0 1 10 10v50a10 10 0 0 1-10 10H57z" fill="#A8A9F5" opacity=".9"/>
+  <path d="M37 20h35a15 15 0 0 1 15 15v58a15 15 0 0 1-15 15H37a15 15 0 0 1-15-15V35a15 15 0 0 1 15-15Z" fill="#5B5CE2"/>
+  <path d="M39 45h31M39 61h21M39 77h31" stroke="white" stroke-width="8" stroke-linecap="round"/>
+  <path d="M88 44v49" stroke="#22235F" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="88" cy="61" r="5" fill="#F7D84A"/>
+</svg>
