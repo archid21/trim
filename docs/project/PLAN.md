@@ -1,0 +1,22 @@
+# Plan
+
+One line per item: `- [ ] P-N Title · done means: <how we know it is done>`.
+
+## Now
+
+- [x] P-1 Measure first: hook order against other plugins, the browser scale input from a hook, real token cost of deferred tool definitions · done means: the three answers are written in the private research notes with the numbers and how they were measured · evidence: verified: the three write-up files exist in the research notes; passed in 0.0 s; override: User approved 2026-11-10: done means the three write-ups exist in the research notes (2026-11-10T17:57Z) at 48d5e65 t:f85c9698
+## Next
+
+- [x] P-2 1a Browser screenshots at half size through the browser tool's scale input · done means: a test shows the screenshot call goes out with scale 0.5 and a click lands on the right element · evidence: verified: python3 -m unittest discover -s tests passed in 0.4 s (2026-11-10T19:24Z)
+- [x] P-3 1b Command output caps: keep failures and last lines, full output to a file · done means: a test shows a long failing test run comes back capped with every failure and the path of the full copy (`python3 -m unittest tests.test_output_cap`) · evidence: verified: python3 -m unittest tests.test_output_cap passed in 1.8 s (2026-11-10T20:44Z) at a859a67 t:f25fd928
+- [x] P-4 1c Tool-result cleanup: strip base64, empty fields and repeated log lines · done means: a test shows a connector result comes back cleaned and the full copy opens from its path (`python3 -m unittest tests.test_tool_cleanup`) · evidence: verified: python3 -m unittest tests.test_tool_cleanup passed in 0.8 s (2026-11-10T23:02Z) at 2f53e1e t:aed17922
+- [x] P-5 1d Repeat reads: an unchanged file returns a pointer; off after a compact · done means: a test shows the second read of an unchanged file returns a pointer, and a full read after a change or a compact · evidence: verified: python3 -m unittest tests.test_repeat_reads passed in 2.7 s; override: Done means names no command. The repeat-read unit tests check each part of it, and the 0.0.8 live test passed. (2026-11-11T02:47Z) at bbc58b8 t:d1faa712
+- [ ] P-6 1e Large pastes saved to a file; image files Claude reads are downscaled (attached images left alone) · done means: a test shows a large paste becomes a file path and a Read of a large image returns a smaller copy
+- [ ] P-7 1f Web pages stripped of navigation, scripts and footers · done means: a test shows a fetched page keeps its main text and loses navigation, scripts and footer
+- [ ] P-8 1g Cap on the length of subagent reports · done means: a test shows a long subagent report comes back capped with the path of the full copy
+- [x] P-9 Savings file: trim writes what it saved where /rightsize report reads it · done means: an ADR in trim and in rightsize fixes the format, and /rightsize report shows a trim line · evidence: verified: python3 -m unittest tests.test_savings passed in 0.4 s; override: User approved 2026-11-11: trim side verified by tests.test_savings (18 pass); rightsize side is ADR 0052, merged to main, /rightsize report has a Trim savings section (read from the rightsize repo, not run) (2026-11-11T15:13Z) at 52ee1e4 t:1ace2a6f
+- [x] P-12 Tips in /trim:setup: offer text-first browsing (with scale: 0.5 in batch screenshots); user confirms; a SessionStart hook adds it from the next session; untick to remove · done means: a test shows the tip with its token cost, nothing changes mid-session, and removing it restores the previous context; a live test shows a batch screenshot in auto mode is not refused · evidence: verified: python3 -m unittest discover -s tests passed in 1.2 s; override: User approved 2026-11-10: unit tests cover tips list/set; live test (desktop app, auto mode) covered the SessionStart hook and batch screenshot at scale 0.5 (2026-11-10T19:40Z) at fccd90e t:8b66956d
+## Later
+
+- [x] P-10 2 Fixed context check (diagnose only): tokens per part; agents, connectors and plugins unused in 90 days; where in Claude Code to turn each off · done means: a test shows the list with tokens per item and where to turn each off, and trim writes no settings or files · evidence: verified: python3 -m unittest tests/test_fixed_context.py passed in 0.7 s; override: User approved: live /trim:context test passed 7/7 checks on 2026-11-10; unit tests verify the code (2026-11-11T06:15Z) at c4a20a6 t:889f58ce
+- [ ] P-11 3 Haiku notes for large non-code results; never source files; easy to turn off · done means: a test shows a transcript gets a note with the full copy path, a source file is never noted, and the switch turns it off

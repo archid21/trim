@@ -1,0 +1,15 @@
+{
+  "name": "trim",
+  "owner": { "name": "Archi Dubey" },
+  "description": "trim: cut what Claude reads",
+  "plugins": [
+    {
+      "name": "trim",
+      "source": "./",
+      "description": "Cuts what Claude reads in Claude Code, and keeps the full version within reach.",
+      "version": "0.1.0",
+      "author": { "name": "Archi Dubey" },
+      "license": "MIT"
+    }
+  ]
+}

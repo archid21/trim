@@ -1,0 +1,15 @@
+.DS_Store
+# Written by Claude Code when it loads the mod from a folder it hot-reloads.
+.claude-plugin/types/
+plugins/*/.claude-plugin/types/
+
+# Decisions and handoff stay private (research-stays-private rule)
+docs/decisions/
+docs/project/HANDOFF.md
+
+# whatsnext state and session handoff notes stay private
+.whatsnext/
+docs/project/handoffs/
+
+# Private working notes stay local (progress files and journals)
+docs/project/progress/
