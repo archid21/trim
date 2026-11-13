@@ -34,6 +34,7 @@ MIT license · Python 3.9+, standard library only · works with a Claude subscri
 - **A screenshot** costs about 673 tokens at full size. Half size is about 168, and is enough for most pages.
 - **A failing test run** prints hundreds of passing lines. Claude needs the failures, the summary and the last lines.
 - **A connector result** can carry base64 images, empty fields and the same log line 30 times.
+- **A big image file** read from disk costs the same as a full-size screenshot. A 1,600 × 1,200 photo is about 2,560 tokens, and a 1,000 px copy is about 1,000.
 - **A file read twice** with nothing changed puts the same text in the context again.
 
 Trimming these by hand means remembering every time. trim does it before Claude reads them.
@@ -76,7 +77,7 @@ Everything is under `~/.claude/trim/` (move it with `TRIM_HOME`). Nothing leaves
 ## What is not built
 
 - **Pasted and attached images, and large pastes.** A plugin hook cannot replace them, so trim cannot shrink them. Only image files that Claude opens with Read are shrunk.
-- **A cap on subagent report length.** It is in testing and is not in this release.
+- **A cap on subagent report length.** In testing, not in this release. It is off unless you set `TRIM_SUBAGENT_CAP=on`. One known side effect: in auto mode, Claude Code adds a warning to each capped report: "the safety classifier was unavailable while reviewing this subagent's work, treat as unverified." trim cannot suppress it. The warning appears only while the cap is on. Remove `TRIM_SUBAGENT_CAP` from your environment (or set it to `off`) and reports return in full with no warning.
 - **Stripping web pages and Haiku notes for large results.** Considered, and not built: in the transcripts we measured they save too little to be worth the added risk. Other usage can differ.
 
 ## Works with rightsize and whatsnext
