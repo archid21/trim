@@ -7,7 +7,7 @@
       "name": "trim",
       "source": "./",
       "description": "Cuts what Claude reads in Claude Code, and keeps the full version within reach.",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "author": { "name": "Archi Dubey" },
       "license": "MIT"
     }

@@ -37,15 +37,17 @@ def png_size(path):
     return struct.unpack(">II", head[16:24])
 
 
-def run_hook(tool_input, home, tool_name="Read", env_extra=None, raw=None, path_env=None):
+def run_hook(tool_input, home, tool_name="Read", env_extra=None, raw=None, path_env=None, cwd=None):
     env = {k: v for k, v in os.environ.items() if not k.startswith("TRIM_")}
     env["TRIM_HOME"] = home
+    env["HOME"] = home  # never read the real user's settings
+    env.pop("CLAUDE_CONFIG_DIR", None)
     if path_env is not None:
         env["PATH"] = path_env
     env.update(env_extra or {})
     stdin = raw if raw is not None else json.dumps({
         "hook_event_name": "PreToolUse", "tool_name": tool_name,
-        "session_id": "sess-1", "tool_input": tool_input,
+        "session_id": "sess-1", "tool_input": tool_input, "cwd": cwd,
     })
     proc = subprocess.run([sys.executable, HOOK], input=stdin, capture_output=True,
                           text=True, env=env, timeout=20)
@@ -136,6 +138,76 @@ class ImageShrinkTest(unittest.TestCase):
         bad = os.path.join(self.pics, "bad.png")
         open(bad, "wb").write(b"not a png at all" * 1000)
         self.assertEqual(run_hook({"file_path": bad}, self.home), (0, None))
+
+    def _settings(self, path, content):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
+
+    def test_a_read_deny_rule_in_any_settings_file_skips_the_shrink(self):
+        """ADR 0020: a rewritten path could dodge a deny rule."""
+        big = self.pic("deny.png", 1600, 1200)
+        proj = os.path.join(self.tmp.name, "proj")
+        rule = json.dumps({"permissions": {"deny": ["Read(./secrets/**)"]}})
+        for rel in (os.path.join(".claude", "settings.json"), os.path.join(".claude", "settings.local.json")):
+            self._settings(os.path.join(proj, rel), rule)
+            self.assertEqual(run_hook({"file_path": big}, self.home, cwd=proj), (0, None), rel)
+            os.remove(os.path.join(proj, rel))
+        self._settings(os.path.join(self.home, ".claude", "settings.json"), json.dumps({"permissions": {"deny": ["Read"]}}))
+        self.assertEqual(run_hook({"file_path": big}, self.home, cwd=proj), (0, None))
+        cfg = os.path.join(self.tmp.name, "cfg")
+        self._settings(os.path.join(cfg, "settings.json"), rule)
+        self.assertEqual(run_hook({"file_path": big}, self.home, cwd=proj, env_extra={"CLAUDE_CONFIG_DIR": cfg}), (0, None))
+
+    def test_a_read_ask_rule_a_parent_folder_rule_and_a_managed_dropin_all_skip(self):
+        big = self.pic("ask.png", 1600, 1200)
+        base = os.path.join(self.tmp.name, "tree")
+        deep = os.path.join(base, "a", "b")
+        os.makedirs(deep)
+        self._settings(os.path.join(base, ".claude", "settings.json"),
+                       json.dumps({"permissions": {"ask": ["Read(**/*.png)"]}}))
+        self.assertEqual(run_hook({"file_path": big}, self.home, cwd=deep), (0, None))  # parent + ask
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("image_shrink", HOOK)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        drop = os.path.join(self.tmp.name, "managed", "managed-settings.d")
+        os.makedirs(drop)
+        self._settings(os.path.join(drop, "10-rules.json"), json.dumps({"permissions": {"deny": ["Read"]}}))
+        orig = mod._settings_files
+        self.assertIn("/Library/Application Support/ClaudeCode/managed-settings.json", orig(None))
+        real_isdir = os.path.isdir
+        mod.os.path.isdir = lambda p: True if p.endswith("managed-settings.d") else real_isdir(p)
+        real_ls = os.listdir
+        mod.os.listdir = lambda p: ["10-rules.json", "x.txt"] if p.endswith("managed-settings.d") else real_ls(p)
+        try:
+            names = [f for f in orig(None) if f.endswith("10-rules.json")]
+        finally:
+            mod.os.path.isdir = real_isdir
+            mod.os.listdir = real_ls
+        self.assertEqual(len(names), 2)  # macOS and Linux managed folders
+
+    def test_other_deny_rules_and_missing_settings_do_not_block(self):
+        big = self.pic("ok.png", 1600, 1200)
+        proj = os.path.join(self.tmp.name, "proj2")
+        self._settings(os.path.join(proj, ".claude", "settings.json"),
+                       json.dumps({"permissions": {"deny": ["Bash(rm:*)", "Edit(./x)"]}}))
+        code, out = run_hook({"file_path": big}, self.home, cwd=proj)
+        self.assertIsNotNone(out)
+
+    def test_an_unreadable_settings_file_fails_closed(self):
+        big = self.pic("bad-settings.png", 1600, 1200)
+        proj = os.path.join(self.tmp.name, "proj3")
+        self._settings(os.path.join(proj, ".claude", "settings.json"), "{not json")
+        self.assertEqual(run_hook({"file_path": big}, self.home, cwd=proj), (0, None))
+
+    def test_a_file_that_is_not_a_png_or_jpeg_is_left_alone(self):
+        fake = os.path.join(self.pics, "fake.png")
+        open(fake, "wb").write(b"<svg xmlns='http://www.w3.org/2000/svg' width='3000' height='3000'/>" * 50)
+        self.assertEqual(run_hook({"file_path": fake}, self.home), (0, None))
+
+    def test_a_relative_path_is_left_alone(self):
+        self.assertEqual(run_hook({"file_path": "-big.png"}, self.home), (0, None))
 
     def test_old_image_copies_are_deleted(self):
         out_dir = os.path.join(self.home, "out")

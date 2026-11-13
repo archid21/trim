@@ -13,7 +13,7 @@ claude plugin marketplace add archid21/trim
 claude plugin install trim@trim --scope user
 ```
 
-**Status: 0.2.0.** Eight features are built and tested; see [What you get](#what-you-get) and [What is not built](#what-is-not-built).
+**Status: 0.2.1.** Eight features are built and tested; see [What you get](#what-you-get) and [What is not built](#what-is-not-built).
 
 MIT license · Python 3.9+, standard library only · works with a Claude subscription (Pro, Max, Ultra) or an API key
 
@@ -46,7 +46,7 @@ Trimming these by hand means remembering every time. trim does it before Claude 
 | Half-size browser screenshots | About 75% fewer tokens per screenshot in the desktop app's built-in browser. Clicks still land. | Automatic. Claude can ask for full size with `scale: 1`. Off: `TRIM_BROWSER_SCALE=off`. |
 | Command output caps | A long test or build run comes back with every failure, every summary line and the last 40 lines. About 80% fewer tokens in one demo (632 lines to 100). Error lines from tsc, npm, git, ESLint and make are kept too, and runs of progress or pass lines become one count line. Exit codes are kept. | Automatic for simple commands (pytest, unittest, jest, npm test, cargo, go, make, tsc and others). Commands with `&&` or `\|` are left alone. Off: `TRIM_OUTPUT_CAP=off`. |
 | Connector result cleanup | Long base64 data, empty JSON fields, repeated lines and runs of progress or pass lines are removed from connector (MCP) results. One demo: 7,595 to 190 characters. Images are left alone. | Automatic for results over 2,000 characters that shrink at least 10%. Off: `TRIM_TOOL_CLEANUP=off`. |
-| Smaller image reads | When Claude reads a big `.png` or `.jpg` file (long edge over 1,250 px), it gets a copy at 1,000 px instead. Your file is never changed. Saves about 2,000 tokens on a phone-sized screenshot (estimate). Needs `sips` (macOS) or ImageMagick. | Automatic. Small text can blur at 1,000 px. Off: `TRIM_IMAGE_SHRINK=off`. |
+| Smaller image reads | When Claude reads a big `.png` or `.jpg` file (long edge over 1,250 px), it gets a copy at 1,000 px instead. Your file is never changed. Saves about 2,000 tokens on a phone-sized screenshot (estimate). Needs `sips` (macOS) or ImageMagick. | Automatic. Small text can blur at 1,000 px. Skipped if your settings deny or ask for any Read. Off: `TRIM_IMAGE_SHRINK=off`. |
 | Repeat reads | A second Read of an unchanged file returns a pointer to the earlier text instead of the text again. | Automatic. A third Read goes through, and so does any Read after a compact or clear. Off: `TRIM_REPEAT_READS=off`. |
 | Fixed context check | Shows what fills your fixed context, in tokens per part, and lists the agent types, connectors and plugins this project has not used in 90 days, with where to turn each one off. Changes nothing. | Run `/trim:context`. |
 | Savings report | What trim saved per feature (all time, 30 days, 7 days) and in your last 5 sessions. | Run `/trim:report`. Logging off: `TRIM_SAVINGS=off`. |
