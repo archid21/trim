@@ -1,5 +1,5 @@
 {
-  "description": "trim hooks. P-2: take browser screenshots at half size (ADR 0004). P-12: add the tips the user turned on in /trim:setup (ADR 0005). P-3: cap long test and build output (ADR 0006). P-4: clean up connector results (ADR 0007). P-5: point to unchanged repeat reads (ADR 0009). P-9: log each saving (ADR 0012).",
+  "description": "trim hooks. P-2: take browser screenshots at half size (ADR 0004). P-12: add the tips the user turned on in /trim:setup (ADR 0005). P-3: cap long test and build output (ADR 0006). P-4: clean up connector results (ADR 0007). P-5: point to unchanged repeat reads (ADR 0009). P-9: log each saving (ADR 0012). P-6: read big image files at a smaller size (ADR 0017).",
   "hooks": {
     "PreToolUse": [
       {
@@ -29,6 +29,16 @@
             "type": "command",
             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/repeat_reads.py\"",
             "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/image_shrink.py\"",
+            "timeout": 10
           }
         ]
       }

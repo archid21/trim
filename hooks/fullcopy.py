@@ -24,20 +24,25 @@ def _clean_old(folder):
     try:
         for name in os.listdir(folder):
             p = os.path.join(folder, name)
-            if name.endswith((".log", ".txt")) and os.path.getmtime(p) < limit:
+            if name.endswith((".log", ".txt", ".png", ".jpg", ".jpeg")) and os.path.getmtime(p) < limit:
                 os.remove(p)
     except OSError:
         pass
 
 
-def save_full_copy(text, suffix=".log"):
-    """Write text to a new private file in the out folder; return its path."""
+def new_copy_path(suffix=".log"):
+    """Return a new unique path in the private out folder (the file is not created)."""
     folder = os.path.join(trim_home(), "out")
     os.makedirs(folder, mode=0o700, exist_ok=True)
     os.chmod(folder, 0o700)
     _clean_old(folder)
     stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    path = os.path.join(folder, "%s-%s%s" % (stamp, secrets.token_hex(4), suffix))
+    return os.path.join(folder, "%s-%s%s" % (stamp, secrets.token_hex(4), suffix))
+
+
+def save_full_copy(text, suffix=".log"):
+    """Write text to a new private file in the out folder; return its path."""
+    path = new_copy_path(suffix)
     flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
     fd = os.open(path, flags, 0o600)
     with os.fdopen(fd, "w", encoding="utf-8") as f:
