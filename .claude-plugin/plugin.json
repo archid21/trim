@@ -1,6 +1,6 @@
 {
   "name": "trim",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Cuts what Claude reads in Claude Code, and keeps the full version within reach.",
   "author": {
     "name": "Archi Dubey"
