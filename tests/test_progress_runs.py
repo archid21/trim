@@ -56,6 +56,11 @@ class CollapseTest(unittest.TestCase):
         lines = ["Downloading a", "Downloading b", "Compiling x", "Downloading c", "done"]
         self.assertEqual(progress_runs.collapse(lines), lines)
 
+    def test_trailing_ok_on_other_lines_is_not_a_progress_line(self):
+        import progress_runs
+        lines = ["the check of file %d ... ok" % i for i in range(5)]
+        self.assertEqual(progress_runs.collapse(lines), lines)
+
     def test_verbose_unittest_ok_lines_collapse(self):
         import progress_runs
         lines = ["test_%03d (t.T) ... ok" % i for i in range(40)]
@@ -86,6 +91,15 @@ class ToolCleanupTest(unittest.TestCase):
         with open(path) as f:
             self.assertEqual(f.read(), original)
 
+    def test_connector_failure_line_inside_a_progress_run_survives(self):
+        lines = ["Compiling a-%d" % i for i in range(20)] + ["Compiling b: error: boom"] + \
+                ["Compiling c-%d" % i for i in range(20)]
+        text = "\n".join(lines + ["padding line %d" % i for i in range(200)])
+        code, out = run_hook([{"type": "text", "text": text}], home=self.home)
+        body = out["hookSpecificOutput"]["updatedMCPToolOutput"][1]["text"]
+        self.assertIn("Compiling b: error: boom", body)
+        self.assertIn('[trim: 20 "Compiling" lines collapsed]', body)
+
 
 class OutputCapTest(unittest.TestCase):
     def setUp(self):
@@ -104,6 +118,20 @@ class OutputCapTest(unittest.TestCase):
         self.assertLess(len(proc.stdout.splitlines()), 40)
         with open(full_copy_path(self, proc.stdout)) as f:
             self.assertEqual(f.read(), original)
+
+    def test_go_summary_lines_in_the_kept_tail_are_not_collapsed(self):
+        lines = ["noise %d" % i for i in range(300)] + ["ok  \tgithub.com/a/pkg%d\t0.1s" % i for i in range(8)]
+        proc = run_cap("\n".join(lines) + "\n", self.home)
+        for i in range(8):
+            self.assertIn("github.com/a/pkg%d" % i, proc.stdout)
+        self.assertNotIn("lines collapsed", proc.stdout)
+
+    def test_header_counts_the_lines_actually_shown(self):
+        original = "\n".join(["noise %d" % i for i in range(300)] + test_log()) + "\n"
+        out = run_cap(original, self.home).stdout.splitlines()
+        shown = int(out[0].split(" lines, ")[1].split(" shown")[0].replace(",", ""))
+        body = [l for l in out[2:] if not l.startswith("[trim] ... ")]
+        self.assertEqual(shown, len(body))
 
 
 if __name__ == "__main__":

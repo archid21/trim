@@ -202,25 +202,30 @@ def needs_cap(text):
     return len(text.splitlines()) > MAX_LINES or len(text) > MAX_CHARS
 
 
+def _keeps(line):
+    return is_failure(line) or is_summary(line)
+
+
 def cap(text, path):
     """Return the capped version of text, naming the full copy at path."""
     lines = text.splitlines()
     kept = _ranges_to_keep(lines)
-    shown = sum(e - s for s, e in kept)
     failures = sum(1 for line in lines if is_failure(line))
     summaries = sum(1 for line in lines if is_summary(line))
+    body = []
+    pos = 0
+    for s, e in kept:
+        if s > pos:
+            body.append("[trim] ... %s lines left out (lines %d-%d) ..." % (format(s - pos, ","), pos + 1, s))
+        body.extend(_cut(line) for line in collapse(lines[s:e], _keeps))
+        pos = e
+    shown = sum(1 for line in body if not line.startswith("[trim] ... "))
     out = [
         "[trim] Output capped: %s lines, %s shown (%s failure or error lines and %s summary lines kept, then the last %d lines)."
         % (format(len(lines), ","), format(shown, ","), format(failures, ","), format(summaries, ","), TAIL_LINES),
         "[trim] Full output: %s" % path,
     ]
-    pos = 0
-    for s, e in kept:
-        if s > pos:
-            out.append("[trim] ... %s lines left out (lines %d-%d) ..." % (format(s - pos, ","), pos + 1, s))
-        out.extend(_cut(line) for line in collapse(lines[s:e], is_failure))
-        pos = e
-    return "\n".join(out) + "\n"
+    return "\n".join(out + body) + "\n"
 
 
 # ----------------------------------------------------------------- cap mode

@@ -23,7 +23,7 @@ _START = re.compile(r"^\s*(%s)\b" % _WORDS)
 _PASS = re.compile(r"^\s*PASS\b")
 _OK = re.compile(r"^ok\s+\S+")
 _TICK = re.compile(r"^\s*[✓✔]\s")
-_VERBOSE_OK = re.compile(r"\.\.\. ok$")
+_VERBOSE_OK = re.compile(r"^\S+ \(\S+\) \.\.\. ok$")
 
 
 def kind(line):
@@ -38,7 +38,7 @@ def kind(line):
         return "ok"
     if _TICK.match(probe):
         return "✓"
-    if _VERBOSE_OK.search(line.rstrip()[-20:]):
+    if len(line) <= PROBE_CHARS and _VERBOSE_OK.match(line.rstrip()):
         return "... ok"
     return None
 
