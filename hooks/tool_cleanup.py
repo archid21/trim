@@ -30,6 +30,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fullcopy import save_full_copy  # noqa: E402
 from savings import log_saving  # noqa: E402
+from progress_runs import collapse_text  # noqa: E402
 
 MIN_CHARS = 2000  # smaller results are left alone
 MIN_SAVING = 0.10  # ... and so are results that would shrink less than this
@@ -90,7 +91,7 @@ def collapse_repeats(text):
 
 
 def clean_string(s):
-    return collapse_repeats(strip_base64(MARKER.sub("(", s)))
+    return collapse_text(collapse_repeats(strip_base64(MARKER.sub("(", s))))
 
 
 def _empty(v):

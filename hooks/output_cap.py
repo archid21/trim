@@ -40,6 +40,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fullcopy import save_full_copy  # noqa: E402
+from progress_runs import collapse  # noqa: E402
 from savings import log_saving  # noqa: E402
 
 MAX_LINES = 150  # output longer than this is capped
@@ -217,7 +218,7 @@ def cap(text, path):
     for s, e in kept:
         if s > pos:
             out.append("[trim] ... %s lines left out (lines %d-%d) ..." % (format(s - pos, ","), pos + 1, s))
-        out.extend(_cut(line) for line in lines[s:e])
+        out.extend(_cut(line) for line in collapse(lines[s:e], is_failure))
         pos = e
     return "\n".join(out) + "\n"
 
