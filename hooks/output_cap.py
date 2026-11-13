@@ -88,7 +88,7 @@ FAILURE = re.compile(
     | ^npm\ ERR!                             # npm
     | ^fatal:                                # git
     | ^\s*\d+:\d+\s+error\s                 # eslint
-    | \*\*\*\ .*\bError\ \d+                  # make
+    | \*\*\*\ [^\n]{0,200}?\bError\ \d+                  # make
     | Segmentation\ fault|\bFATAL\b|command\ not\ found|undefined\ reference\ to
     """
 )
@@ -160,6 +160,15 @@ def hook_main():
 # ----------------------------------------------------------------- capping
 
 
+
+def is_failure(line):
+    return bool(FAILURE.search(line[:LINE_CHARS]))  # bounded probe: no slow match on huge lines
+
+
+def is_summary(line):
+    return bool(SUMMARY.search(line[:LINE_CHARS]))
+
+
 def _merge(ranges):
     merged = []
     for s, e in sorted(ranges):
@@ -173,11 +182,11 @@ def _merge(ranges):
 def _ranges_to_keep(lines):
     """Return sorted, merged (start, end) index ranges to keep (end exclusive)."""
     n = len(lines)
-    hits = [i for i, line in enumerate(lines) if FAILURE.search(line)]
+    hits = [i for i, line in enumerate(lines) if is_failure(line)]
     ranges = [(max(0, i - BEFORE), min(n, i + AFTER + 1)) for i in hits]
     if sum(e - s for s, e in _merge(ranges)) > FAIL_BUDGET:
         ranges = [(i, i + 1) for i in hits]  # every failure line, no context
-    ranges += [(i, i + 1) for i, line in enumerate(lines) if SUMMARY.search(line)]
+    ranges += [(i, i + 1) for i, line in enumerate(lines) if is_summary(line)]
     ranges.append((max(0, n - TAIL_LINES), n))
     return _merge(ranges)
 
@@ -197,8 +206,8 @@ def cap(text, path):
     lines = text.splitlines()
     kept = _ranges_to_keep(lines)
     shown = sum(e - s for s, e in kept)
-    failures = sum(1 for line in lines if FAILURE.search(line))
-    summaries = sum(1 for line in lines if SUMMARY.search(line))
+    failures = sum(1 for line in lines if is_failure(line))
+    summaries = sum(1 for line in lines if is_summary(line))
     out = [
         "[trim] Output capped: %s lines, %s shown (%s failure or error lines and %s summary lines kept, then the last %d lines)."
         % (format(len(lines), ","), format(shown, ","), format(failures, ","), format(summaries, ","), TAIL_LINES),

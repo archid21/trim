@@ -209,6 +209,13 @@ class RunTest(unittest.TestCase):
         proc = run_cap("\n".join(lines) + "\n", self.home)
         self.assertLess(len(proc.stdout.splitlines()), 150)
 
+    def test_huge_line_of_repeated_markers_is_matched_fast(self):
+        import time
+        text = "ok\n" * 300 + "*** " * 200000 + "\n"
+        start = time.time()
+        run_cap(text, self.home)
+        self.assertLess(time.time() - start, 10)
+
     def test_off_switch_passes_full_output(self):
         proc = run_cap("x\n" * 500, self.home, {"TRIM_OUTPUT_CAP": "off"})
         self.assertEqual(len(proc.stdout.splitlines()), 500)
