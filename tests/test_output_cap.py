@@ -184,6 +184,31 @@ class RunTest(unittest.TestCase):
             self.assertIn("FAIL: case_%d\n" % i, proc.stdout)
         full_copy_path(self, proc.stdout)
 
+    def test_errors_in_other_tools_output_survive_the_cut_middle(self):
+        """P-13: error lines of tsc, npm, git and eslint in the middle are kept."""
+        errors = [
+            "src/app.ts(12,5): error TS2322: Type 'string' is not assignable to type 'number'.",
+            "npm ERR! code ELIFECYCLE",
+            "fatal: not a git repository (or any of the parent directories): .git",
+            "  12:5  error  'x' is assigned a value but never used  no-unused-vars",
+            "make: *** [all] Error 2",
+            "Segmentation fault (core dumped)",
+        ]
+        lines = ["filler %d" % i for i in range(1200)]
+        for n, e in enumerate(errors):
+            lines[100 + n * 150] = e
+        proc = run_cap("\n".join(lines) + "\n", self.home)
+        for e in errors:
+            self.assertIn(e, proc.stdout)
+        self.assertNotIn("filler 300\n", proc.stdout)  # still capped
+        full_copy_path(self, proc.stdout)
+
+    def test_words_like_error_in_ordinary_lines_do_not_flood_the_output(self):
+        lines = ["Compiling error_handler.rs (module %d)" % i for i in range(1200)]
+        lines += ["no_errors_found = true"] * 100
+        proc = run_cap("\n".join(lines) + "\n", self.home)
+        self.assertLess(len(proc.stdout.splitlines()), 150)
+
     def test_off_switch_passes_full_output(self):
         proc = run_cap("x\n" * 500, self.home, {"TRIM_OUTPUT_CAP": "off"})
         self.assertEqual(len(proc.stdout.splitlines()), 500)

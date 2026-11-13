@@ -84,6 +84,12 @@ FAILURE = re.compile(
     | \bpanicked\ at\b                      # rust
     | ^\s*[✕✗×●]\s                          # jest, vitest
     | \bFAIL(?:ED|URE|URES)?\b
+    | \berror\ TS\d+:                       # tsc
+    | ^npm\ ERR!                             # npm
+    | ^fatal:                                # git
+    | ^\s*\d+:\d+\s+error\s                 # eslint
+    | \*\*\*\ .*\bError\ \d+                  # make
+    | Segmentation\ fault|\bFATAL\b|command\ not\ found|undefined\ reference\ to
     """
 )
 
